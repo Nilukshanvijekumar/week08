@@ -21,6 +21,8 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+# Small change for Task 8.1P so the CI workflow has a new commit to build.
+
 
 def initialise_database() -> None:
     maximum_attempts = 10
