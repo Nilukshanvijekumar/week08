@@ -1,5 +1,6 @@
 import {
   Alert,
+  Box,
   Button,
   Card,
   CardContent,
@@ -86,21 +87,28 @@ const Login = () => {
   };
 
   return (
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "#0d7377",
+        py: 8,
+      }}
+    >
     <Container maxWidth="sm">
-      <Card sx={{ mt: 10 }}>
+      <Card sx={{ mt: 2 }}>
         <CardContent sx={{ p: 4 }}>
           <Typography
             variant="h4"
             gutterBottom
           >
-            KoalaTech University
+            KoalaTech University CD
           </Typography>
 
           <Typography
             color="text.secondary"
             sx={{ mb: 3 }}
           >
-            Sign in to continue
+            Automated production release
           </Typography>
 
           {error && (
@@ -152,6 +160,7 @@ const Login = () => {
         </CardContent>
       </Card>
     </Container>
+    </Box>
   );
 };
 
