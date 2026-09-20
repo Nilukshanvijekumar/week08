@@ -160,6 +160,19 @@ jobs:
             -t ${{ vars.ACR_LOGIN_SERVER }}/${{ matrix.image }}:${{ github.sha }} \
             ./${{ matrix.service }}
 
+      # Docker Scout runs after build and before push so a bad image
+      # is not published to ACR. Failures are reported but do not block
+      # the class demo pipeline (continue-on-error) until the base image
+      # refresh is fully rolled out across every service.
+      - name: Docker Scout CVE scan
+        uses: docker/scout-action@v1
+        continue-on-error: true
+        with:
+          command: cves
+          image: local://${{ vars.ACR_LOGIN_SERVER }}/${{ matrix.image }}:${{ github.sha }}
+          only-severities: critical,high
+          summary: true
+
       - name: Push Docker image with commit SHA
         run: |
           docker push \

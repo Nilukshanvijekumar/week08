@@ -197,3 +197,10 @@ cython_debug/
 .cursorindexingignore
 
 node_modules/
+
+# Local Terraform (Week 08 infrastructure, not part of the class app)
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/tfplan

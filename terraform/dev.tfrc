@@ -1,0 +1,9 @@
+provider_installation {
+  filesystem_mirror {
+    path    = "E:/Nilukshan/Masters in IT/T2/SIT722/week06/example-1/terraform/.terraform/providers"
+    include = ["registry.terraform.io/hashicorp/azurerm"]
+  }
+  direct {
+    exclude = ["registry.terraform.io/hashicorp/azurerm"]
+  }
+}

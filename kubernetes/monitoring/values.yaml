@@ -1,0 +1,28 @@
+# kube-prometheus-stack values for Week 08 KoalaTech on AKS.
+# Used with: helm install prometheus prometheus-community/kube-prometheus-stack
+#            -n monitoring --create-namespace -f kubernetes/monitoring/values.yaml
+
+grafana:
+  adminUser: admin
+  persistence:
+    enabled: false
+  service:
+    type: ClusterIP
+    port: 80
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    resources:
+      requests:
+        cpu: 100m
+        memory: 400Mi
+
+alertmanager:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
+
+nodeExporter:
+  enabled: true

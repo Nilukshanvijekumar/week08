@@ -1,0 +1,83 @@
+name: 00 - Terraform
+
+# Infrastructure as Code gate. Validate and plan on every relevant change.
+# Apply stays manual (workflow_dispatch) so the shared CloudLabs AKS cluster
+# is not recreated by accident from a push to main.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "terraform/**"
+      - ".github/workflows/00-terraform.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "terraform/**"
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Also run terraform apply (use carefully)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+jobs:
+  terraform:
+    name: Terraform validate and plan
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform
+
+    env:
+      TF_IN_AUTOMATION: "true"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Export Azure credentials for Terraform
+        run: |
+          CREDS='${{ secrets.AZURE_CREDENTIALS }}'
+          echo "ARM_CLIENT_ID=$(echo "$CREDS" | jq -r .clientId)" >> "$GITHUB_ENV"
+          echo "ARM_CLIENT_SECRET=$(echo "$CREDS" | jq -r .clientSecret)" >> "$GITHUB_ENV"
+          echo "ARM_SUBSCRIPTION_ID=$(echo "$CREDS" | jq -r .subscriptionId)" >> "$GITHUB_ENV"
+          echo "ARM_TENANT_ID=$(echo "$CREDS" | jq -r .tenantId)" >> "$GITHUB_ENV"
+
+      - name: Terraform plan
+        run: |
+          terraform plan -input=false -no-color -out=tfplan
+          terraform show -no-color tfplan
+
+      - name: Terraform apply
+        if: >
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.apply == 'true'
+        run: terraform apply -input=false -auto-approve tfplan

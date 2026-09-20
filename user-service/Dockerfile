@@ -1,4 +1,6 @@
-FROM python:3.12-slim
+# Bumped from python:3.12-slim after Docker Scout (Task 10.2D) reported
+# fixable critical CVEs in the Debian packages shipped with the older tag.
+FROM python:3.13-slim
 
 WORKDIR /app
 
